@@ -430,7 +430,7 @@ function resetRace(def) {
 function seedInitialTraffic(def) {
   const rng = mulberry32(def.seed + Date.now() % 100000);
   for (let i = 0; i < def.trafficCount; i++) {
-    const z = 2600 + rng() * (DRAW_DISTANCE * SEG_LEN * 0.85);
+    const z = 7000 + rng() * (DRAW_DISTANCE * SEG_LEN * 0.75);
     spawnCarAt(def, z, true);
   }
 }
@@ -456,8 +456,8 @@ function maintainTraffic(def) {
   const ahead = game.cars.filter(c => c.z > game.position).length;
   const need = def.trafficCount - ahead;
   for (let i = 0; i < need; i++) {
-    const z = game.position + 5200 + Math.random() * (DRAW_DISTANCE * SEG_LEN * 0.8);
-    if (z < game.trackLength - 1200) spawnCarAt(def, z);
+    const z = game.position + 12500 + Math.random() * (DRAW_DISTANCE * SEG_LEN * 0.72);
+    if (z < game.finishZ - 1500) spawnCarAt(def, z);
   }
 }
 function findSegment(z) {
@@ -809,10 +809,14 @@ function drawScenerySprite(sprite, scale, destX, destY, clipY) {
       ctx.fillStyle = g; ctx.fillRect(destX - w / 2, destY - h, w, h);
       // لبه‌ی نئون
       const neon = ['#ff2e96', '#19d3ff', '#ffb347', '#3ddc84'][(rng() * 4) | 0];
-      ctx.fillStyle = neon; ctx.shadowColor = neon; ctx.shadowBlur = 12;
+      // هاله‌ی ارزان (به‌جای shadowBlur)
+      ctx.globalAlpha *= 0.32; ctx.fillStyle = neon;
+      ctx.fillRect(destX - w / 2 - 6, destY - h, 9, h);
+      ctx.fillRect(destX + w / 2 - 3, destY - h, 9, h);
+      ctx.globalAlpha /= 0.32;
+      ctx.fillStyle = neon;
       ctx.fillRect(destX - w / 2 - 2, destY - h, 3.5, h);
       ctx.fillRect(destX + w / 2 - 1.5, destY - h, 3.5, h);
-      ctx.shadowBlur = 0;
       // پنجره‌ها
       const cols = 3 + ((rng() * 3) | 0), rows = Math.max(4, (h / 26) | 0);
       for (let r = 0; r < rows; r++) for (let cN = 0; cN < cols; cN++) {
@@ -1010,10 +1014,13 @@ function drawCarSprite(car, scale, x, y, segClipY) {
   // چراغ‌های عقب
   const tailG = ctx.createLinearGradient(x - w * 0.42, 0, x + w * 0.42, 0);
   tailG.addColorStop(0, '#ff2a1a'); tailG.addColorStop(0.5, '#ff7a5e'); tailG.addColorStop(1, '#ff2a1a');
-  ctx.fillStyle = tailG; ctx.shadowColor = '#ff3a1a'; ctx.shadowBlur = Math.min(14, w * 0.06);
+  ctx.globalAlpha *= 0.35; ctx.fillStyle = '#ff3a1a';
+  rr(x - w * 0.44, y - h * 0.36, w * 0.32, h * 0.135, 4); ctx.fill();
+  rr(x + w * 0.12, y - h * 0.36, w * 0.32, h * 0.135, 4); ctx.fill();
+  ctx.globalAlpha /= 0.35;
+  ctx.fillStyle = tailG;
   rr(x - w * 0.4, y - h * 0.33, w * 0.24, h * 0.075, 3); ctx.fill();
   rr(x + w * 0.16, y - h * 0.33, w * 0.24, h * 0.075, 3); ctx.fill();
-  ctx.shadowBlur = 0;
   // لاستیک‌ها
   ctx.fillStyle = '#0c0c10';
   rr(x - w * 0.52, y - h * 0.16, w * 0.13, h * 0.17, 2); ctx.fill();
@@ -1106,11 +1113,11 @@ function drawPlayerCar(now) {
   tail.addColorStop(0, braking ? '#ff1a0a' : '#c21e10');
   tail.addColorStop(0.5, braking ? '#ff8a70' : '#ff4a2e');
   tail.addColorStop(1, braking ? '#ff1a0a' : '#c21e10');
+  ctx.globalAlpha *= 0.32; ctx.fillStyle = braking ? '#ff2a0a' : '#ff3a1a';
+  rr(cx - cw * 0.44, yB - ch * 0.225, cw * 0.88, ch * 0.14, ch * 0.05); ctx.fill();
+  ctx.globalAlpha /= 0.32;
   ctx.fillStyle = tail;
-  ctx.shadowColor = braking ? '#ff2a0a' : '#ff3a1a';
-  ctx.shadowBlur = braking ? 34 : 20;
   rr(cx - cw * 0.40, yB - ch * 0.185, cw * 0.8, ch * 0.062, ch * 0.03); ctx.fill();
-  ctx.shadowBlur = 0;
   // دیفیوزر + اگزوز
   ctx.fillStyle = '#160b08';
   rr(cx - cw * 0.30, yB - ch * 0.075, cw * 0.6, ch * 0.075, 3); ctx.fill();
@@ -1234,6 +1241,10 @@ function renderWorld(now) {
     const yAt = t => lerp(p1.y, p2.y, t);
 
     const camDist1 = seg.p1.camera.z;
+    // محو تدریجی در مه (جلوگیری از ظاهرشدن ناگهانی در افق)
+    const fogA = clamp(seg.fog * 1.22, 0, 1);
+    if (fogA < 0.05) continue;
+    ctx.globalAlpha = fogA;
     for (const coin of coinSegs.get(seg.index) || []) {
       const t = (coin.z % SEG_LEN) / SEG_LEN;
       if (coin.z - game.position < 270) continue; // زیر دوربین
@@ -1248,7 +1259,9 @@ function renderWorld(now) {
       if (sprite.type !== 'arch' && camDist1 < 110) continue; // اسپرایتِ غول‌پیکر
       drawScenerySprite(sprite, p1.scale, p1.x + p1.scale * sprite.offset * ROAD_WIDTH * (W / 2), p1.y, seg.clip);
     }
+    ctx.globalAlpha = 1;
   }
+  ctx.globalAlpha = 1; // ایمنی
 
   drawParticles();
   drawPlayerCar(now);
@@ -1446,6 +1459,30 @@ $('#mute-btn').addEventListener('click', () => {
 });
 // وضعیت اولیه‌ی آیکن صدا
 if (AudioSys.muted) { $('#snd-on').style.display = 'none'; $('#snd-off').style.display = ''; }
+
+// ── پیش‌بارگذاری تصاویر (تا منو و کارت‌ها فوری دیده شوند) ──
+if (typeof Image !== 'undefined') {
+  ['assets/keyart.jpg', 'assets/track-city.jpg', 'assets/track-desert.jpg', 'assets/track-mountain.jpg']
+    .forEach(src => { const im = new Image(); im.src = src; });
+}
+
+// ── کنترل‌های لمسی (فقط در دستگاه‌های لمسی فعال می‌شود) ──
+const nav = typeof navigator !== 'undefined' ? navigator : {};
+const isTouchDevice = (window.matchMedia && window.matchMedia('(pointer: coarse)').matches)
+  || 'ontouchstart' in window
+  || (nav.maxTouchPoints > 0);
+if (isTouchDevice) document.body.classList.add('touch');
+$$('.tbtn').forEach(btn => {
+  const key = btn.dataset.key;
+  if (!key) return;
+  const on = e => { e.preventDefault(); keys[key] = true; btn.classList.add('active'); };
+  const off = e => { if (e.cancelable) e.preventDefault(); keys[key] = false; btn.classList.remove('active'); };
+  btn.addEventListener('pointerdown', on);
+  btn.addEventListener('pointerup', off);
+  btn.addEventListener('pointercancel', off);
+  btn.addEventListener('pointerleave', off);
+  btn.addEventListener('contextmenu', e => e.preventDefault());
+});
 
 /* ───────── ۱۳) حلقه‌ی اصلی ───────── */
 let lastTime = 0;

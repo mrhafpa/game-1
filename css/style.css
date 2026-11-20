@@ -424,3 +424,29 @@ kbd {
 @media (prefers-reduced-motion: reduce) {
   * { animation-duration: .01ms !important; transition-duration: .15s !important; }
 }
+
+/* ═══════════ کنترل‌های لمسی (فقط نمایش در دستگاه لمسی) ═══════════ */
+.touch-controls { display: none; }
+body.touch .touch-controls { display: block; }
+.tc-cluster { position: absolute; bottom: clamp(14px, 2.6vh, 26px); display: flex; gap: 12px; align-items: flex-end; z-index: 24; }
+.tc-steer { right: 14px; }
+.tc-pedals { left: 14px; }
+.tbtn {
+  pointer-events: auto;
+  width: 60px; height: 60px; border-radius: 50%;
+  border: 1.5px solid rgba(255,255,255,.32);
+  background: rgba(10,10,20,.42);
+  backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+  display: grid; place-items: center;
+  cursor: pointer; -webkit-tap-highlight-color: transparent; user-select: none; touch-action: none;
+  transition: transform .1s, background .15s, border-color .15s;
+}
+.tbtn:active, .tbtn.active { background: rgba(25,211,255,.28); border-color: var(--cyan); transform: scale(.9); }
+.tbtn-gas { width: 72px; height: 72px; border-color: rgba(61,220,132,.55); }
+.tbtn-gas:active, .tbtn-gas.active { background: rgba(61,220,132,.3); border-color: var(--green); }
+.tbtn-brake { border-color: rgba(255,77,46,.55); }
+.tbtn-brake:active, .tbtn-brake.active { background: rgba(255,77,46,.3); border-color: var(--red); }
+.tbtn-nitro { border-color: rgba(25,211,255,.55); margin-bottom: 6px; }
+.tbtn-nitro:active, .tbtn-nitro.active { background: rgba(25,211,255,.3); border-color: var(--cyan); }
+body.touch #pause-btn { width: 36px; height: 36px; }
+.screen-menu { background-color: #0d0a18; }

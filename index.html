@@ -6,12 +6,18 @@
   <meta name="description" content="گاز آخر | Full Throttle — یک بازی ماشین‌سواری و مسابقه‌ای سه‌بعدی‌نما با سه مسیر متفاوت: تهرانِ شب، کویر لوت و گردنه‌ی البرز. با کیبورد بازی کنید." />
   <title>گاز آخر | FULL THROTTLE — مسابقه در سه مسیر</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%23120f1e'/%3E%3Cpath fill='%23ff2e63' d='M12 66l8-22c2-5 7-8 12-8h36c5 0 10 3 12 8l8 22c1 3 3 4 4 4v10h-10v-6H18v6H8V70c1 0 3-1 4-4z'/%3E%3Ccircle cx='28' cy='68' r='7' fill='%231a1a26' stroke='%2319d3ff' stroke-width='3'/%3E%3Ccircle cx='72' cy='68' r='7' fill='%231a1a26' stroke='%2319d3ff' stroke-width='3'/%3E%3C/svg%3E" />
+  <meta name="theme-color" content="#0b0b12" />
+  <link rel="preload" as="image" href="assets/keyart.jpg" />
+  <link rel="preload" as="image" href="assets/track-city.jpg" />
+  <link rel="preload" as="image" href="assets/track-desert.jpg" />
+  <link rel="preload" as="image" href="assets/track-mountain.jpg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&family=Vazirmatn:wght@400;500;700;800;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
+  <noscript><p style="color:#fff;background:#0b0b12;padding:24px;font-family:Tahoma">این بازی برای اجرا به جاوااسکریپت نیاز دارد. / This game needs JavaScript.</p></noscript>
 
   <main id="app">
     <div id="game-shell" aria-label="بازی گاز آخر">
@@ -62,6 +68,19 @@
               <div class="nitro-head"><span>نیترو</span><span class="nitro-key">SPACE</span></div>
               <div class="nitro-bar"><div id="nitro-fill"></div></div>
             </div>
+          </div>
+        </div>
+
+        <!-- کنترل‌های لمسی (فقط در دستگاه‌های لمسی نمایش داده می‌شود) -->
+        <div class="touch-controls" aria-hidden="true">
+          <div class="tc-cluster tc-steer">
+            <button class="tbtn" data-key="left" aria-label="فرمان چپ"><svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="#dff4ff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+            <button class="tbtn" data-key="right" aria-label="فرمان راست"><svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="#dff4ff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>
+          </div>
+          <div class="tc-cluster tc-pedals">
+            <button class="tbtn tbtn-nitro" data-key="space" aria-label="نیترو"><svg viewBox="0 0 24 24" width="30" height="30" fill="#9be2ff"><path d="M13 2 4.5 13.5H11L9.5 22 18 10.5h-6.5L13 2z"/></svg></button>
+            <button class="tbtn tbtn-brake" data-key="down" aria-label="ترمز"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="#ffb0a0" stroke-width="2.4" stroke-linecap="round"><path d="M7 18L17 6M7 6l10 12"/></svg></button>
+            <button class="tbtn tbtn-gas" data-key="up" aria-label="گاز"><svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="#c6ffdd" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
           </div>
         </div>
       </div>
